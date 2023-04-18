@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My BuyList</title>
+    <link rel="stylesheet" href="./style/cart.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  </head>
+  <body>
+    <div id="buylist">
+      <h1>MyBuyList 購物清單</h1>
+      <div class="buy_item">
+        <label for="">產品名稱</label
+        ><input id="input_name" type="text" placeholder="請輸入名稱" /><label
+          for=""
+          >價錢</label
+        ><input id="input_price" type="number" placeholder="$1234" /><span
+          class="add_btn"
+          >+新增</span
+        >
+      </div>
+      <div id="items_list"></div>
+    </div>
+
+    <script>
+      let item_url =
+        "https://awiclass.monoame.com/api/command.php?type=get&name=itemdata";
+
+      let shoplist = {};
+      shoplist.name = "MyBuyList 購物清單";
+      shoplist.time = "2023/04/12";
+      shoplist.list = [
+        { name: "吹風機", price: 500 },
+        { name: "麥克風", price: 9000 },
+        { name: "筆記型電腦", price: 40000 },
+        { name: "iPhone9", price: 32000 },
+        { name: "神奇海螺", price: 5000 },
+      ];
+
+      // $.ajax({
+      //   url: item_url,
+      //   success: function (response) {
+      //     shoplist.list = JSON.parse(response);
+      //     showlist();
+      //   },
+      // });
+
+      let item_html =
+        '<li >{{num}}. {{item}}<div class="price">${{price}}</div><div id={{id}} class="del_btn">X</div></li>';
+      let total_html =
+        '<li class="total">總價<div class="price total_price">${{price}}</div></li>';
+
+      function showlist() {
+        $("#items_list").html("");
+        let total_price = 0;
+        for (let i = 0; i < shoplist.list.length; i++) {
+          let item = shoplist.list[i];
+          total_price += parseInt(item.price);
+          new_item_html = item_html //不能直接改item_html，因為第一次改完，第二次就抓不到大括號物件了
+            .replace("{{num}}", i + 1)
+            .replace("{{item}}", item.name)
+            .replace("{{price}}", item.price)
+            .replace("{{id}}", "buyitem_" + i);
+          $("#items_list").append(new_item_html);
+          $("#buyitem_" + i).click(function (e) {
+            e.preventDefault();
+            remove_item(i);
+          });
+        }
+        new_total_html = total_html.replace("{{price}}", total_price);
+        $("#items_list").append(new_total_html);
+      }
+      showlist();
+
+      $(".add_btn").click(function (e) {
+        e.preventDefault();
+        shoplist.list.push({
+          name: $("#input_name").val(),
+          price: $("#input_price").val(),
+        });
+        $("#input_name").val("");
+        $("#input_price").val("");
+        showlist();
+      });
+
+      function remove_item(id) {
+        shoplist.list.splice(id, 1); //切割陣列中從第幾個位置數來第幾個元素
+        showlist();
+      }
+    </script>
+  </body>
+</html>
